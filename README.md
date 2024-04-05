@@ -23,4 +23,5 @@ WHERE
     a.issue_type = '0'
 """
 df3 = db.raw_sql(query, date_cols=['date'])
+df3['ticker'].unique()
 ```
