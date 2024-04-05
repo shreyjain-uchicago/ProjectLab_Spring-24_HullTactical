@@ -10,3 +10,19 @@ Tasks to do:
 6. Understand the IV curve at earnings date
 7. Based on IV curves shape, we will be trading the straddle on earnings date and square-off next day
 8. Analyze if IV curve is concave
+
+
+## Getting equity tickers in OptionMetrics dataset
+table_name = f"optionm.securd"  # Generate table name dynamically
+query = f"""
+SELECT
+    *
+FROM 
+    {table_name} a
+WHERE
+    a.issue_type = '0'
+"""
+df3 = db.raw_sql(query, date_cols=['date'])
+
+df3
+##
