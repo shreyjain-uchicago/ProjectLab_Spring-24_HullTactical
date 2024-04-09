@@ -30,16 +30,19 @@ def pull_CRSP_daily_file(start_date, end_date):
     query = f"""
     SELECT 
         date,
-        dsf.permno, dsf.permco, 
+        dsf.permno, dsf.permco, exchcd,
         prc, bid, ask, shrout, cfacpr, cfacshr,
-        ret, retx, htsymbol, hcomnam
+        ret, retx, ticker, comnam
     FROM crsp.dsf AS dsf
     LEFT JOIN 
-        crsp.dsfhdr as dsfhdr
+        crsp.msenames as msenames
     ON 
-        dsf.permno = dsfhdr.permno 
+        dsf.permno = msenames.permno AND
+        msenames.namedt <= dsf.date AND
+        dsf.date <= msenames.nameendt
     WHERE 
-        dsf.date BETWEEN '{start_date}' AND '{end_date}'
+        dsf.date BETWEEN '{start_date}' AND '{end_date}' AND
+        msenames.exchcd BETWEEN 1 AND 3
     """
 
     df = db.raw_sql(
@@ -73,7 +76,7 @@ def clean_prc_to_positive(df):
 Drop the stocks that have prices less than $20 during our research time period
 """
 def clean_price_20(df):
-    df = df.groupby('htsymbol').filter(lambda x: x['prc'].min() >= 20)
+    df = df.groupby('ticker').filter(lambda x: x['prc'].min() >= 20)
     return df
 
 
@@ -97,7 +100,7 @@ def merge_ticker(df):
     df_ticker = db.raw_sql(query, date_cols=['date'])
     tickers = df_ticker['ticker'].unique()
 
-    df = df[df['htsymbol'].isin(tickers)]
+    df = df[df['ticker'].isin(tickers)]
     return df
 
 
@@ -110,7 +113,7 @@ after getting ER dates, only wants the stock prices before or after ER
 
 if __name__ == "__main__":
     # Pull CRSP daily stock data
-    df_dsf = pull_CRSP_daily_file(start_date="2010-01-01", end_date="2023-02-28")
+    df_dsf = pull_CRSP_daily_file(start_date="2018-01-01", end_date="2023-02-28")
     
     # change to postive prc
     df_dsf = clean_prc_to_positive(df_dsf)
@@ -126,5 +129,9 @@ if __name__ == "__main__":
     # future work: filter stock prices before or after ER dates
 
     # save the dataset
-    df_dsf[['date', 'permno', 'prc','bid','ask', 'htsymbol', 'hcomnam' ]].to_csv('data/stock_price.csv', index=False)
+    df_dsf[['date', 'permno', 'prc','bid','ask', 'ticker', 'comnam' ]].to_parquet('data/stock_price.parquet', index=False)
+
+    # save the tickers
+    tickers = pd.DataFrame(df_dsf['ticker'].unique())
+    tickers.to_csv('tickers2018_2023.csv', index=False, header=False)
    
