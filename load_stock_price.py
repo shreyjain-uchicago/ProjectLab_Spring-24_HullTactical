@@ -133,5 +133,6 @@ if __name__ == "__main__":
 
     # save the tickers
     tickers = pd.DataFrame(df_dsf['ticker'].unique())
-    tickers.to_csv('tickers2018_2023.csv', index=False, header=False)
+    tickers.columns = ['ticker']
+    tickers.to_csv('tickers2018_2023.csv', index=False)
    
