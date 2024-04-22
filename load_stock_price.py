@@ -113,7 +113,7 @@ after getting ER dates, only wants the stock prices before or after ER
 
 if __name__ == "__main__":
     # Pull CRSP daily stock data
-    df_dsf = pull_CRSP_daily_file(start_date="2018-01-01", end_date="2023-02-28")
+    df_dsf = pull_CRSP_daily_file(start_date="2018-01-01", end_date="2023-12-30")
     
     # change to postive prc
     df_dsf = clean_prc_to_positive(df_dsf)
@@ -129,10 +129,10 @@ if __name__ == "__main__":
     # future work: filter stock prices before or after ER dates
 
     # save the dataset
-    df_dsf[['date', 'permno', 'prc','bid','ask', 'ticker', 'comnam' ]].to_parquet('data/stock_price.parquet', index=False)
+    df_dsf[['date', 'permno', 'prc','bid','ask', 'ticker', 'comnam' ]].to_parquet('stock_price.parquet', index=False)
 
-    # save the tickers
-    tickers = pd.DataFrame(df_dsf['ticker'].unique())
-    tickers.columns = ['ticker']
-    tickers.to_csv('tickers2018_2023.csv', index=False)
+    # # save the tickers
+    # tickers = pd.DataFrame(df_dsf['ticker'].unique())
+    # tickers.columns = ['ticker']
+    # tickers.to_csv('tickers2018_2023.csv', index=False)
    
