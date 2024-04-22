@@ -129,7 +129,7 @@ if __name__ == "__main__":
     # future work: filter stock prices before or after ER dates
 
     # save the dataset
-    df_dsf[['date', 'permno', 'prc','bid','ask', 'ticker', 'comnam' ]].to_parquet('stock_price.parquet', index=False)
+    df_dsf[['date', 'ticker', 'prc','bid','ask', 'permno', 'permco', 'comnam' ]].to_parquet('stock_price.parquet', index=False)
 
     # # save the tickers
     # tickers = pd.DataFrame(df_dsf['ticker'].unique())
